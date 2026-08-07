@@ -1,17 +1,35 @@
 import axios from 'axios';
 import { v4 as uuid } from 'uuid';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 const PRODUCT_ID = 'seed-product-1';
-const USER_ID = '076c51a4-c1b3-4f2e-ab0f-75c78a505d9f'; // from Prisma Studio
-const CONCURRENT_REQUESTS = 30; // more requests than stock available
+const CONCURRENT_REQUESTS = 30;
 const BASE_URL = 'http://localhost:3000';
 
-async function attemptCheckout(index: number) {
+async function getOrCreateTestUsers(count: number): Promise<string[]> {
+  const userIds: string[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const email = `loadtest-user-${i}@example.com`;
+    const user = await prisma.user.upsert({
+      where: { email },
+      update: {},
+      create: { email },
+    });
+    userIds.push(user.id);
+  }
+
+  return userIds;
+}
+
+async function attemptCheckout(index: number, userId: string) {
   try {
     const res = await axios.post(`${BASE_URL}/checkout`, {
       productId: PRODUCT_ID,
-      userId: USER_ID,
-      idempotencyKey: uuid(), // unique per request, simulating distinct purchases
+      userId,
+      idempotencyKey: uuid(),
     });
     return { index, status: res.status, success: true };
   } catch (err: any) {
@@ -25,10 +43,12 @@ async function attemptCheckout(index: number) {
 }
 
 async function main() {
-  console.log(`Firing ${CONCURRENT_REQUESTS} concurrent checkout requests...`);
+  console.log(`Preparing ${CONCURRENT_REQUESTS} distinct test users...`);
+  const userIds = await getOrCreateTestUsers(CONCURRENT_REQUESTS);
 
+  console.log(`Firing ${CONCURRENT_REQUESTS} concurrent checkout requests (one per user)...`);
   const results = await Promise.all(
-    Array.from({ length: CONCURRENT_REQUESTS }, (_, i) => attemptCheckout(i))
+    userIds.map((userId, i) => attemptCheckout(i, userId))
   );
 
   const successes = results.filter((r) => r.success);
@@ -38,7 +58,8 @@ async function main() {
   console.log(`Failed/rejected checkouts: ${failures.length}`);
   console.log(`\n--- Now check the DB ---`);
   console.log(`Run: npx prisma studio`);
-  console.log(`Expected if broken: stockCount is negative, or successful orders > initial stock`);
+
+  await prisma.$disconnect();
 }
 
 main();

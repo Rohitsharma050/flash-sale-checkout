@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { checkoutSafe } from '../services/checkoutService';
+import { rateLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 
-router.post('/checkout', async (req: Request, res: Response) => {
+router.post('/checkout', rateLimiter, async (req: Request, res: Response) => {
   const { productId, userId, idempotencyKey } = req.body;
 
   if (!productId || !userId || !idempotencyKey) {
