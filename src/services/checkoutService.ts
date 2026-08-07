@@ -102,7 +102,7 @@
 import prisma from '../lib/prisma';
 import { tryDecrementStock, restoreStock, initStockInRedis } from './stockService';
 import { Prisma } from '@prisma/client';
-
+import { orderConfirmationQueue } from '../lib/queue';
 interface CheckoutInput {
   productId: string;
   userId: string;
@@ -141,6 +141,21 @@ export async function checkoutSafe({ productId, userId, idempotencyKey }: Checko
       data: { stockCount: { decrement: 1 } },
     });
 
+    // Fire-and-forget: checkout response doesn't wait for this
+  await orderConfirmationQueue.add('confirm-order', {
+  orderId: order.id,
+  userId,
+  productId,
+  
+},
+ {
+    attempts: 5,
+    backoff: {
+      type: "exponential",
+      delay: 1000
+    }
+  }
+);
     return order;
   } catch (err) {
     // 2. Slow path: two requests with the SAME idempotency key raced past the
