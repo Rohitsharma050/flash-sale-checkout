@@ -3,25 +3,29 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
- "scripts": {
-  "dev": "tsx watch src/index.ts",
-  "build": "tsc",
-  "start": "node dist/index.js",
-  "seed": "tsx prisma/seed.ts"
-},
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "seed": "tsx prisma/seed.ts",
+    "test:concurrency": "tsx scripts/concurrency-test.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "axios": "^1.19.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "ioredis": "^6.0.0"
+    "ioredis": "^6.0.0",
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.2",
+    "@types/uuid": "^10.0.0",
     "prisma": "^5.22.0",
     "tsx": "^4.23.8",
     "typescript": "^7.0.2"

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { checkoutNaive } from '../services/checkoutService';
+import { checkoutSafe } from '../services/checkoutService';
 
 const router = Router();
 
@@ -11,7 +11,7 @@ router.post('/checkout', async (req: Request, res: Response) => {
   }
 
   try {
-    const order = await checkoutNaive({ productId, userId, idempotencyKey });
+    const order = await checkoutSafe({ productId, userId, idempotencyKey });
     res.status(201).json(order);
   } catch (err: any) {
     const status = err.status || 500;
