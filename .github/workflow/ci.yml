@@ -56,5 +56,8 @@ jobs:
       - name: Run migrations
         run: npx prisma migrate deploy
 
+      - name: Seed database
+        run: npm run seed
+
       - name: Run tests
         run: npm test
