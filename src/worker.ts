@@ -1,12 +1,16 @@
 import { Worker, Job } from 'bullmq';
 import dotenv from 'dotenv';
 import prisma from './lib/prisma';
+import { URL } from 'url';
 
 dotenv.config();
 
+
+const redisUrl = new URL(process.env.REDIS_URL || 'redis://localhost:6379');
+
 const connection = {
-  host: 'localhost',
-  port: 6379,
+  host: redisUrl.hostname,
+  port: Number(redisUrl.port) || 6379,
 };
 
 const worker = new Worker(

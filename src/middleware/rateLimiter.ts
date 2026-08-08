@@ -106,3 +106,7 @@ export async function rateLimiter(req: Request, res: Response, next: NextFunctio
 
   next();
 }
+
+export async function resetRateLimit(userId: string) {
+  await redis.del(`ratelimit:token:${userId}`);
+}

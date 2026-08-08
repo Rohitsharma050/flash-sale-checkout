@@ -45,3 +45,11 @@ export async function tryDecrementStock(productId: string): Promise<boolean> {
 export async function restoreStock(productId: string) {
   await redis.incr(stockKey(productId));
 }
+
+export async function resetStock(productId: string, newStockCount: number) {
+  await prisma.product.update({
+    where: { id: productId },
+    data: { stockCount: newStockCount },
+  });
+  await redis.set(stockKey(productId), newStockCount);
+}
