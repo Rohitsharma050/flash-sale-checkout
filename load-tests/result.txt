@@ -1,0 +1,58 @@
+D:\Projects\flash-sale-checkout>k6 run load-tests/flash-sale.js
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: load-tests/flash-sale.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 100 max VUs, 1m5s max duration (incl. graceful stop):
+              * flash_sale_spike: Up to 100 looping VUs for 35s over 3 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+
+
+  █ THRESHOLDS 
+
+    checks
+    ✓ 'rate>0.99' rate=100.00%
+
+    http_req_duration
+    ✓ 'p(95)<500' p(95)=64.56ms
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 42288   1206.142486/s
+    checks_succeeded...: 100.00% 42288 out of 42288
+    checks_failed......: 0.00%   0 out of 42288
+
+    ✓ status is 201, 409, or 429
+    ✓ no 5xx errors
+
+    HTTP
+    http_req_duration....: avg=29.28ms  min=2.24ms   med=24.81ms  max=228.09ms p(90)=53.09ms  p(95)=64.56ms 
+    http_req_failed......: 100.00% 21144 out of 21144
+    http_reqs............: 21144   603.071243/s
+
+    EXECUTION
+    iteration_duration...: avg=130.23ms min=102.95ms med=125.63ms max=330.5ms  p(90)=154.39ms p(95)=166.11ms
+    iterations...........: 21144   603.071243/s
+    vus..................: 6       min=6              max=100
+    vus_max..............: 100     min=100            max=100
+
+    NETWORK
+    data_received........: 6.6 MB  187 kB/s
+    data_sent............: 5.6 MB  160 kB/s
+
+
+
+
+running (0m35.1s), 000/100 VUs, 21144 complete and 0 interrupted iterations
+flash_sale_spike ✓ [======================================] 000/100 VUs  35s
+
+D:\Projects\flash-sale-checkout>
